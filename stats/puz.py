@@ -52,43 +52,40 @@ def get_sport():
 # Fetch Options for User Input
 def fetch_options(api_key, sport, data_type, identifier=None):
     base_url = "https://api.sportsdata.io/v3/"
-    headers = {"Ocp-Apim-Subscription-Key": api_key}
-    MLB_API_KEY = os.getenv('MLB_API_KEY')
-    SOCCER_API_KEY = os.getenv('SOCCER_API_KEY')
-    NFL_API_KEY = os.getenv('NFL_API_KEY')
-    NBA_API_KEY = os.getenv('NBA_API_KEY')
-    CBB_API_KEY = os.getenv('CBB_API_KEY')
+    soccer_url ="https://api.sportsdata.io/v4"
+    team_abbr = team_mappings[sport].get(identifier, "Unknown") if identifier else None
+
     url = ""
     if data_type == 'Team':
+        # Use team abbreviation for team data endpoint
         if sport == 'MLB':
-            url = f"{base_url}/mlb/scores/json/AllTeams?key={MLB_API_KEY}"
+            url = f"{base_url}mlb/scores/json/AllTeams?key={api_key}"
         elif sport == 'Soccer':
-            url = f"{base_url}soccer/scores/json/Teams?key={SOCCER_API_KEY}"  # Add necessary parameter if required
+            # Soccer API might need a different approach for team ID
+            url = f"{base_url}soccer/scores/json/Teams?key={api_key}"
         elif sport == 'NFL':
-            url = f"{base_url}nfl/scores/json/AllTeams?key={NFL_API_KEY}"
+            url = f"{base_url}nfl/scores/json/AllTeams?key={api_key}"
         elif sport == 'NBA':
-            url = f"{base_url}nba/scores/json/AllTeams?key={NBA_API_KEY}"
+            url = f"{base_url}nba/scores/json/AllTeams?key={api_key}"
         elif sport == 'College Basketball':
-            url = f"{base_url}cbb/scores/json/TeamsBasic"
-        # Add conditions for other sports if necessary
+            url = f"{base_url}cbb/scores/json/TeamsBasic?key={api_key}"
 
-    elif data_type == 'Player' and identifier:
+    elif data_type == 'Player':
+        # Directly use identifier for player data endpoint
         if sport == 'MLB':
-            url = f"{base_url}/mlb/scores/json/PlayersBasic/{team_mappings}?key={MLB_API_KEY}"
+            url = f"{base_url}mlb/scores/json/PlayersBasic/{team_mappings}?key={api_key}"
         elif sport == 'Soccer':
-            url = f"{base_url}soccer/scores/json/PlayersByTeamBasic/{identifier}"
+            url = f"{soccer_url}soccer/scores/json/PlayersByTeam/{team_mappings}?key={api_key}"
         elif sport == 'NFL':
-            url = os.getenv(f"{base_url}/nfl/scores/json/PlayersBasic/{team_mappings}?key={NFL_API_KEY}")
+            url = f"{base_url}nfl/scores/json/PlayersBasic/{team_mappings}?key={api_key}"
         elif sport == 'NBA':
-            url = f"{base_url}/nba/scores/json/PlayersBasic/{team_mappings}?key={NBA_API_KEY}"
+            url = f"{base_url}nba/scores/json/Players/{team_mappings}?key={api_key}"
         elif sport == 'College Basketball':
-            url = f"{base_url}cbb/scores/json/PlayersBasic/{identifier}"
-        # Add conditions for other sports with proper identifier
+            url = f"{base_url}cbb/scores/json/PlayersBasic/{team_mappings}?key={api_key}"
 
-    response = requests.get(url, headers=headers)
+    response = requests.get(url)
     if response.status_code == 200:
-        data = response.json()
-        return [item['Name'] for item in data]
+        return [item['Name'] for item in response.json()]
     else:
         print(f"Error fetching data: {response.status_code}")
         return []
