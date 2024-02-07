@@ -7,6 +7,7 @@ from prompt_toolkit.completion import WordCompleter
 from dotenv import load_dotenv
 import os
 
+
 # User Registration
 def register_user(db):
     username = input("Enter a new username: ")
@@ -44,120 +45,8 @@ def get_sport():
     sports_completer = WordCompleter(['MLB', 'Soccer', 'NFL', 'NBA', 'College Basketball'], ignore_case=True)
     return prompt('Select the sport: ', completer=sports_completer)
 
-# API Interaction
-# def get_data(api_key, sport, data_type, name):
-#     sport_endpoints = {
-#         'MLB': 'mlb/scores/json',
-#         #players by team endpoint: https://api.sportsdata.io/v3/mlb/scores/json/Players/%7Bteam%7D?key=4062184fd0e7475cb86d2832e63064c5
-#         #Teams (all) endpoint: https://api.sportsdata.io/v3/mlb/scores/json/AllTeams?key=4062184fd0e7475cb86d2832e63064c5
-#         'Soccer': 'soccer/scores/json',
-#         #players by team endpoint: https://api.sportsdata.io/v4/soccer/scores/json/PlayersByTeamBasic/%7Bcompetition%7D/%7Bteamid%7D?key=598b84cd809749a586e7a480ca1eaa04
-#         #teams endpoint: https://api.sportsdata.io/v4/soccer/scores/json/Teams/%7Bcompetition%7D?key=598b84cd809749a586e7a480ca1eaa04
-#         'NFL': 'nfl/scores/json',
-#         #players by team endpoint: https://api.sportsdata.io/v3/nfl/scores/json/PlayersBasic/%7Bteam%7D?key=a268f97f6a4d4c8ba60c26eb9b725464
-#         #teams endpoint: https://api.sportsdata.io/v3/nfl/scores/json/AllTeams?key=a268f97f6a4d4c8ba60c26eb9b725464
-#         'NBA': 'nba/scores/json',
-#         #players by team endpoint: https://api.sportsdata.io/v3/nba/scores/json/Players/%7Bteam%7D?key=04f5903db2524c31a41890c2b17cff75
-#         #teams endpoint: https://api.sportsdata.io/v3/nba/scores/json/AllTeams?key=04f5903db2524c31a41890c2b17cff75
-#         'College Basketball': 'college-basketball/scores/json'
-#         #players by team endpoint: https://api.sportsdata.io/v3/cbb/scores/json/PlayersBasic/%7Bteam%7D?key=7454dddc0831496d90a59b35a9aa4c54
-#         #teams endpoint: https://api.sportsdata.io/v3/cbb/scores/json/TeamsBasic?key=7454dddc0831496d90a59b35a9aa4c54
-#     }
-
-#     base_url = f"https://api.sportsdata.io/v3/{sport_endpoints[sport]}/{data_type}/{name}"
-#     headers = {
-#         "Ocp-Apim-Subscription-Key": api_key
-#     }
-#     response = requests.get(base_url, headers=headers)
-#     if response.status_code == 200:
-#         return response.json()
-#     else:
-#         print(f"Error fetching data: {response.status_code}")
-#         return None
-# def get_data(api_key, sport, data_type, identifier):
-#     base_url = "https://api.sportsdata.io/v3/"
-#     headers = {"Ocp-Apim-Subscription-Key": api_key}
-
-#     url = ""
-#     if data_type == 'Team':
-#         if sport == 'MLB':
-#             url = f"{base_url}mlb/scores/json/AllTeams"
-#         elif sport == 'Soccer':
-#             url = f"{base_url}soccer/scores/json/Teams/{identifier}"  # Replace {identifier} with competition ID
-#         elif sport == 'NFL':
-#             url = f"{base_url}nfl/scores/json/AllTeams"
-#         elif sport == 'NBA':
-#             url = f"{base_url}nba/scores/json/AllTeams"
-#         elif sport == 'College Basketball':
-#             url = f"{base_url}cbb/scores/json/TeamsBasic"
-#         # Add more sports and their corresponding team endpoints as needed
-
-#     elif data_type == 'Player By Team':
-#         if sport == 'MLB':
-#             url = f"{base_url}mlb/scores/json/Players/{identifier}"
-#         elif sport == 'Soccer':
-#             url = f"{base_url}soccer/scores/json/PlayersByTeamBasic/{identifier}"  # Replace {identifier} with team ID
-#         elif sport == 'NFL':
-#             url = f"{base_url}nfl/scores/json/PlayersBasic/{identifier}"
-#         elif sport == 'NBA':
-#             url = f"{base_url}nba/scores/json/Players/{identifier}"
-#         elif sport == 'College Basketball':
-#             url = f"{base_url}cbb/scores/json/PlayersBasic/{identifier}"
-#         # Add more sports and their corresponding player endpoints as needed
-
-#     response = requests.get(url, headers=headers)
-#     if response.status_code == 200:
-#         return response.json()
-#     else:
-#         print(f"Error fetching data: {response.status_code}")
-#         return None
 
 
-# Fetch Options for User Input
-# def fetch_options(api_key, sport, data_type):
-#     base_url = "https://api.sportsdata.io/v3/"
-#     headers = {"Ocp-Apim-Subscription-Key": api_key}
-
-#     url = ""
-#     if data_type == 'Team':
-#         if sport == 'MLB':
-#             url = f"{base_url}mlb/scores/json/AllTeams"
-#         elif sport == 'Soccer':
-#             url = f"{base_url}soccer/scores/json/Teams"  # Replace {identifier} with competition ID
-#         elif sport == 'NFL':
-#             url = f"{base_url}nfl/scores/json/AllTeams"
-#         elif sport == 'NBA':
-#             url = f"{base_url}nba/scores/json/AllTeams"
-#         elif sport == 'College Basketball':
-#             url = f"{base_url}cbb/scores/json/TeamsBasic"
-#         # Add more sports and their corresponding team endpoints as needed
-
-#     elif data_type == 'Player By Team':
-#         if sport == 'MLB':
-#             url = f"{base_url}mlb/scores/json/AllPlayers"
-#             #https://api.sportsdata.io/v3/mlb/scores/json/PlayersBasic/%7Bteam%7D?key=4062184fd0e7475cb86d2832e63064c5
-#         elif sport == 'Soccer':
-#             url = f"{base_url}soccer/scores/json/Players"  # Replace {identifier} with team ID
-#         elif sport == 'NFL':
-#             url = f"{base_url}nfl/scores/json/AllPlayers"
-#             #https://api.sportsdata.io/v3/nfl/scores/json/PlayersBasic/%7Bteam%7D?key=a268f97f6a4d4c8ba60c26eb9b725464
-#         elif sport == 'NBA':
-#             url = f"{base_url}nba/scores/json/AllPlayers"
-#         elif sport == 'College Basketball':
-#             url = f"{base_url}cbb/scores/json/PlayersBasic"
-#         # Add more sports and their corresponding player endpoints as needed
-
-#     response = requests.get(url, headers=headers)
-#     if response.status_code == 200:
-#         data = response.json()
-#         if data_type == 'Team':
-#             return [team['Name'] for team in data]
-#         elif data_type == 'Player':
-#             return [player['Name'] for player in data]
-#     else:
-#         print(f"Error fetching data: {response.status_code}")
-#         return []
-    
 def fetch_options(api_key, sport, data_type, identifier=None):
     base_url = "https://api.sportsdata.io/v3/"
     headers = {"Ocp-Apim-Subscription-Key": api_key}
@@ -227,15 +116,6 @@ def display_player_stats(api_key, sport, player_name):
         print(f"Error fetching player stats: {response.status_code}")
 
 
-# User Input for API Data
-# def user_input(api_key, sport):
-#     data_type_completer = WordCompleter(['Team', 'Player'], ignore_case=True)
-#     data_type = prompt('Enter the type of data you want: ', completer=data_type_completer)
-#     options = fetch_options(api_key, sport, data_type)
-#     option_completer = WordCompleter(options, ignore_case=True)
-#     name = prompt(f"Select the specific {data_type}: ", completer=option_completer)
-
-#     return data_type, name
 
 def user_input(api_key, sport):
     # Choose Team
@@ -342,4 +222,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
