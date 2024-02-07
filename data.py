@@ -1,10 +1,11 @@
-import os
 import requests
 import pymongo
 from pymongo.errors import ConnectionFailure
 import bcrypt
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
+from dotenv import load_dotenv
+import os
 
 # User Registration
 def register_user(db):
@@ -39,36 +40,139 @@ def login_user(db):
         return False
 
 # API Interaction
-def get_data(api_key, sport, data_type, name):
-    sport_endpoints = {
-        'MLB': 'mlb/scores/json',
-        'Soccer': 'soccer/scores/json',
-        'NFL': 'nfl/scores/json',
-        'NBA': 'nba/scores/json',
-        'College Basketball': 'college-basketball/scores/json'
-    }
+# def get_data(api_key, sport, data_type, name):
+#     sport_endpoints = {
+#         'MLB': 'mlb/scores/json',
+#         #players by team endpoint: https://api.sportsdata.io/v3/mlb/scores/json/Players/%7Bteam%7D?key=4062184fd0e7475cb86d2832e63064c5
+#         #Teams (all) endpoint: https://api.sportsdata.io/v3/mlb/scores/json/AllTeams?key=4062184fd0e7475cb86d2832e63064c5
+#         'Soccer': 'soccer/scores/json',
+#         #players by team endpoint: https://api.sportsdata.io/v4/soccer/scores/json/PlayersByTeamBasic/%7Bcompetition%7D/%7Bteamid%7D?key=598b84cd809749a586e7a480ca1eaa04
+#         #teams endpoint: https://api.sportsdata.io/v4/soccer/scores/json/Teams/%7Bcompetition%7D?key=598b84cd809749a586e7a480ca1eaa04
+#         'NFL': 'nfl/scores/json',
+#         #players by team endpoint: https://api.sportsdata.io/v3/nfl/scores/json/PlayersBasic/%7Bteam%7D?key=a268f97f6a4d4c8ba60c26eb9b725464
+#         #teams endpoint: https://api.sportsdata.io/v3/nfl/scores/json/AllTeams?key=a268f97f6a4d4c8ba60c26eb9b725464
+#         'NBA': 'nba/scores/json',
+#         #players by team endpoint: https://api.sportsdata.io/v3/nba/scores/json/Players/%7Bteam%7D?key=04f5903db2524c31a41890c2b17cff75
+#         #teams endpoint: https://api.sportsdata.io/v3/nba/scores/json/AllTeams?key=04f5903db2524c31a41890c2b17cff75
+#         'College Basketball': 'college-basketball/scores/json'
+#         #players by team endpoint: https://api.sportsdata.io/v3/cbb/scores/json/PlayersBasic/%7Bteam%7D?key=7454dddc0831496d90a59b35a9aa4c54
+#         #teams endpoint: https://api.sportsdata.io/v3/cbb/scores/json/TeamsBasic?key=7454dddc0831496d90a59b35a9aa4c54
+#     }
 
-    base_url = f"https://api.sportsdata.io/v3/{sport_endpoints[sport]}/{data_type}/{name}"
-    headers = {
-        "Ocp-Apim-Subscription-Key": api_key
-    }
-    response = requests.get(base_url, headers=headers)
+#     base_url = f"https://api.sportsdata.io/v3/{sport_endpoints[sport]}/{data_type}/{name}"
+#     headers = {
+#         "Ocp-Apim-Subscription-Key": api_key
+#     }
+#     response = requests.get(base_url, headers=headers)
+#     if response.status_code == 200:
+#         return response.json()
+#     else:
+#         print(f"Error fetching data: {response.status_code}")
+#         return None
+def get_data(api_key, sport, data_type, identifier):
+    base_url = "https://api.sportsdata.io/v3/"
+    headers = {"Ocp-Apim-Subscription-Key": api_key}
+
+    url = ""
+    if data_type == 'Team':
+        if sport == 'MLB':
+            url = f"{base_url}mlb/scores/json/AllTeams"
+        elif sport == 'Soccer':
+            url = f"{base_url}soccer/scores/json/Teams/{identifier}"  # Replace {identifier} with competition ID
+        elif sport == 'NFL':
+            url = f"{base_url}nfl/scores/json/AllTeams"
+        elif sport == 'NBA':
+            url = f"{base_url}nba/scores/json/AllTeams"
+        elif sport == 'College Basketball':
+            url = f"{base_url}cbb/scores/json/TeamsBasic"
+        # Add more sports and their corresponding team endpoints as needed
+
+    elif data_type == 'Player':
+        if sport == 'MLB':
+            url = f"{base_url}mlb/scores/json/Players/{identifier}"
+        elif sport == 'Soccer':
+            url = f"{base_url}soccer/scores/json/PlayersByTeamBasic/{identifier}"  # Replace {identifier} with team ID
+        elif sport == 'NFL':
+            url = f"{base_url}nfl/scores/json/PlayersBasic/{identifier}"
+        elif sport == 'NBA':
+            url = f"{base_url}nba/scores/json/Players/{identifier}"
+        elif sport == 'College Basketball':
+            url = f"{base_url}cbb/scores/json/PlayersBasic/{identifier}"
+        # Add more sports and their corresponding player endpoints as needed
+
+    response = requests.get(url, headers=headers)
     if response.status_code == 200:
         return response.json()
     else:
         print(f"Error fetching data: {response.status_code}")
         return None
 
+
 # User Input for API Data
-def user_input():
+# def user_input():
+#     sports_completer = WordCompleter(['MLB', 'Soccer', 'NFL', 'NBA', 'College Basketball'], ignore_case=True)
+#     data_type_completer = WordCompleter(['Team', 'Player'], ignore_case=True)
+
+#     print("Select the sport:")
+#     sport = prompt('Sport: ', completer=sports_completer)
+#     print("Enter the type of data you want:")
+#     data_type = prompt('Data Type: ', completer=data_type_completer)
+#     name = input(f"Enter the specific {data_type} name: ")
+#     return sport, data_type, name
+
+# Fetch Options for User Input
+def fetch_options(api_key, sport, data_type):
+    base_url = "https://api.sportsdata.io/v3/"
+    headers = {"Ocp-Apim-Subscription-Key": api_key}
+
+    url = ""
+    if data_type == 'Team':
+        if sport == 'MLB':
+            url = f"{base_url}mlb/scores/json/AllTeams"
+        elif sport == 'Soccer':
+            url = f"{base_url}soccer/scores/json/Teams"  # Replace {identifier} with competition ID
+        elif sport == 'NFL':
+            url = f"{base_url}nfl/scores/json/AllTeams"
+        elif sport == 'NBA':
+            url = f"{base_url}nba/scores/json/AllTeams"
+        elif sport == 'College Basketball':
+            url = f"{base_url}cbb/scores/json/TeamsBasic"
+        # Add more sports and their corresponding team endpoints as needed
+
+    elif data_type == 'Player':
+        if sport == 'MLB':
+            url = f"{base_url}mlb/scores/json/AllPlayers"
+        elif sport == 'Soccer':
+            url = f"{base_url}soccer/scores/json/Players"  # Replace {identifier} with team ID
+        elif sport == 'NFL':
+            url = f"{base_url}nfl/scores/json/AllPlayers"
+        elif sport == 'NBA':
+            url = f"{base_url}nba/scores/json/AllPlayers"
+        elif sport == 'College Basketball':
+            url = f"{base_url}cbb/scores/json/PlayersBasic"
+        # Add more sports and their corresponding player endpoints as needed
+
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        if data_type == 'Team':
+            return [team['Name'] for team in data]
+        elif data_type == 'Player':
+            return [player['Name'] for player in data]
+    else:
+        print(f"Error fetching data: {response.status_code}")
+        return []
+
+def user_input(api_key):
     sports_completer = WordCompleter(['MLB', 'Soccer', 'NFL', 'NBA', 'College Basketball'], ignore_case=True)
     data_type_completer = WordCompleter(['Team', 'Player'], ignore_case=True)
 
-    print("Select the sport:")
-    sport = prompt('Sport: ', completer=sports_completer)
-    print("Enter the type of data you want:")
-    data_type = prompt('Data Type: ', completer=data_type_completer)
-    name = input(f"Enter the specific {data_type} name: ")
+    sport = prompt('Select the sport: ', completer=sports_completer)
+    data_type = prompt('Enter the type of data you want: ', completer=data_type_completer)
+    options = fetch_options(api_key, sport, data_type)
+    option_completer = WordCompleter(options, ignore_case=True)
+    name = prompt(f"Select the specific {data_type}: ", completer=option_completer)
+
     return sport, data_type, name
 
 #Quick Sort Algorithm
@@ -83,12 +187,17 @@ def quick_sort(arr):
 
 # Main Function
 def main():
-    api_key = "YOUR API KEY"  # replace with your actual API key
+    load_dotenv()
+    soccer_api_key = os.getenv('SOCCER_API_KEY')
+    nfl_api_key = os.getenv('NFL_API_KEY')
+    nba_api_key = os.getenv('NBA_API_KEY')
+    mlb_api_key = os.getenv('MLB_API_KEY')
+    cbb_api_key = os.getenv('CBB_API_KEY')
 
     try:
         # Attempt to connect to MongoDB
         print("Attempting to connect to MongoDB...")
-        db_client = pymongo.MongoClient("mongodb://root:6376@10.0.1.172:27017/SportsData")
+        db_client = pymongo.MongoClient("mongodb://root:6376@10.0.1.172:27017/")
         db = db_client["SportsData"]
         print("Connected to MongoDB database:", db.name)
 
