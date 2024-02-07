@@ -9,6 +9,8 @@ import os
 from team_mappings import team_mappings
 from player_mappings import player_mappings
 
+#load environment variables
+load_dotenv()
 
 # User Registration
 def register_user(db):
@@ -51,30 +53,34 @@ def get_sport():
 def fetch_options(api_key, sport, data_type, identifier=None):
     base_url = "https://api.sportsdata.io/v3/"
     headers = {"Ocp-Apim-Subscription-Key": api_key}
-
+    MLB_API_KEY = os.getenv('MLB_API_KEY')
+    SOCCER_API_KEY = os.getenv('SOCCER_API_KEY')
+    NFL_API_KEY = os.getenv('NFL_API_KEY')
+    NBA_API_KEY = os.getenv('NBA_API_KEY')
+    CBB_API_KEY = os.getenv('CBB_API_KEY')
     url = ""
     if data_type == 'Team':
         if sport == 'MLB':
-            url = f"{base_url}mlb/scores/json/AllTeams"
+            url = f"{base_url}/mlb/scores/json/AllTeams?key={MLB_API_KEY}"
         elif sport == 'Soccer':
-            url = f"{base_url}soccer/scores/json/Teams"  # Add necessary parameter if required
+            url = f"{base_url}soccer/scores/json/Teams?key={SOCCER_API_KEY}"  # Add necessary parameter if required
         elif sport == 'NFL':
-            url = f"{base_url}nfl/scores/json/AllTeams"
+            url = f"{base_url}nfl/scores/json/AllTeams?key={NFL_API_KEY}"
         elif sport == 'NBA':
-            url = f"{base_url}nba/scores/json/AllTeams"
+            url = f"{base_url}nba/scores/json/AllTeams?key={NBA_API_KEY}"
         elif sport == 'College Basketball':
             url = f"{base_url}cbb/scores/json/TeamsBasic"
         # Add conditions for other sports if necessary
 
     elif data_type == 'Player' and identifier:
         if sport == 'MLB':
-            url = f"{base_url}mlb/scores/json/Players/{identifier}"
+            url = f"{base_url}/mlb/scores/json/PlayersBasic/{team_mappings}?key={MLB_API_KEY}"
         elif sport == 'Soccer':
             url = f"{base_url}soccer/scores/json/PlayersByTeamBasic/{identifier}"
         elif sport == 'NFL':
-            url = f"{base_url}nfl/scores/json/PlayersBasic/{identifier}"
+            url = os.getenv(f"{base_url}/nfl/scores/json/PlayersBasic/{team_mappings}?key={NFL_API_KEY}")
         elif sport == 'NBA':
-            url = f"{base_url}nba/scores/json/Players/{identifier}"
+            url = f"{base_url}/nba/scores/json/PlayersBasic/{team_mappings}?key={NBA_API_KEY}"
         elif sport == 'College Basketball':
             url = f"{base_url}cbb/scores/json/PlayersBasic/{identifier}"
         # Add conditions for other sports with proper identifier
@@ -87,31 +93,33 @@ def fetch_options(api_key, sport, data_type, identifier=None):
         print(f"Error fetching data: {response.status_code}")
         return []
 
-def display_team_stats(api_key, sport, team_name):
-    # Assuming you have an API endpoint that gives you team stats based on the team name or ID
+def display_team_stats(api_key, sport, team_abbr):
     base_url = "https://api.sportsdata.io/v3/"
     headers = {"Ocp-Apim-Subscription-Key": api_key}
-    team_stats_url = f"{base_url}{sport.lower()}/scores/json/TeamStats/{team_name}"  # Modify URL as per your API
-
+    team_stats_url = f"{base_url}{sport.lower()}/scores/json/TeamStats/{team_abbr}"
+    print("Requesting URL:", team_stats_url)  # Debug print
     response = requests.get(team_stats_url, headers=headers)
+    print("Response:", response.status_code, response.json())
+
     if response.status_code == 200:
         team_stats = response.json()
         # Process and display team stats
-        print(f"Stats for {team_name}: {team_stats}")  # Modify as per the actual data structure
+        print(f"Stats for {team_abbr}: {team_stats}")  # Modify as per the actual data structure
     else:
         print(f"Error fetching team stats: {response.status_code}")
 
-def display_player_stats(api_key, sport, player_name):
-    # Assuming you have an API endpoint that gives you player stats based on the player name or ID
+def display_player_stats(api_key, sport, player_abbr):
     base_url = "https://api.sportsdata.io/v3/"
     headers = {"Ocp-Apim-Subscription-Key": api_key}
-    player_stats_url = f"{base_url}{sport.lower()}/scores/json/PlayerStats/{player_name}"  # Modify URL as per your API
-
+    player_stats_url = f"{base_url}{sport.lower()}/scores/json/PlayerStats/{player_abbr}"
+    print("Requesting URL:", player_stats_url)  # Debug print
     response = requests.get(player_stats_url, headers=headers)
+    print("Response:", response.status_code, response.json())
+
     if response.status_code == 200:
         player_stats = response.json()
         # Process and display player stats
-        print(f"Stats for {player_name}: {player_stats}")  # Modify as per the actual data structure
+        print(f"Stats for {player_abbr}: {player_stats}")  # Modify as per the actual data structure
     else:
         print(f"Error fetching player stats: {response.status_code}")
 
@@ -151,7 +159,7 @@ def quick_sort(arr):
 
 #main
 def main():
-    load_dotenv()
+    
     api_keys = {
         'Soccer': os.getenv('SOCCER_API_KEY'),
         'NFL': os.getenv('NFL_API_KEY'),
