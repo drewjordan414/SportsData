@@ -3,7 +3,8 @@ import requests
 import pymongo
 from pymongo.errors import ConnectionFailure
 import bcrypt
-
+from prompt_toolkit import prompt
+from prompt_toolkit.completion import WordCompleter
 
 # User Registration
 def register_user(db):
@@ -60,12 +61,14 @@ def get_data(api_key, sport, data_type, name):
 
 # User Input for API Data
 def user_input():
-    print("Select the sport (MLB, Soccer, NFL, NBA, College Basketball):")
-    sport = input()
-    print("Enter the type of data you want (e.g., 'team', 'player'):")
-    data_type = input()
-    print(f"Enter the specific {data_type} name:")
-    name = input()
+    sports_completer = WordCompleter(['MLB', 'Soccer', 'NFL', 'NBA', 'College Basketball'], ignore_case=True)
+    data_type_completer = WordCompleter(['team', 'player'], ignore_case=True)
+
+    print("Select the sport:")
+    sport = prompt('Sport: ', completer=sports_completer)
+    print("Enter the type of data you want:")
+    data_type = prompt('Data Type: ', completer=data_type_completer)
+    name = input(f"Enter the specific {data_type} name: ")
     return sport, data_type, name
 
 #Quick Sort Algorithm
