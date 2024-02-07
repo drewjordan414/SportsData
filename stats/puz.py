@@ -6,6 +6,9 @@ from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 from dotenv import load_dotenv
 import os
+from team_mappings import team_mappings
+from player_mappings import player_mappings
+
 
 # User Registration
 def register_user(db):
@@ -114,22 +117,24 @@ def display_player_stats(api_key, sport, player_name):
 
 # User Input Function
 def user_input(api_key, sport):
-    # Choose Team
+    # Fetch and display team options
     team_options = fetch_options(api_key, sport, 'Team')
     team_completer = WordCompleter(team_options, ignore_case=True)
     team_name = prompt("Select the Team: ", completer=team_completer)
+    team_abbr = team_mappings[sport].get(team_name, "Unknown")
 
     # Choose between showing team stats or players
     post_team_selection_completer = WordCompleter(['Show Team Stats', 'Show Players'], ignore_case=True)
     post_team_selection = prompt("Choose an option: ", completer=post_team_selection_completer)
 
     if post_team_selection == 'Show Team Stats':
-        display_team_stats(api_key, sport, team_name)
+        display_team_stats(api_key, sport, team_abbr)
     elif post_team_selection == 'Show Players':
-        player_options = fetch_options(api_key, sport, 'Player', team_name)
+        player_options = fetch_options(api_key, sport, 'Player', team_abbr)
         player_completer = WordCompleter(player_options, ignore_case=True)
         player_name = prompt("Select the Player: ", completer=player_completer)
-        display_player_stats(api_key, sport, player_name)
+        player_abbr = player_mappings[sport].get(player_name, "Unknown")
+        display_player_stats(api_key, sport, player_abbr)
 
     return team_name, post_team_selection
 
@@ -180,10 +185,9 @@ def main():
         print("Failed to connect to MongoDB. Please check the connection settings.")
         return
 
-    # After successful login
+   # After successful login
     sport = get_sport()
     api_key = api_keys.get(sport, "default_api_key_if_not_found")
-
     team_name, post_team_selection = user_input(api_key, sport)
 
     # If you have additional logic or functionality you want to implement after this, you can add it here
