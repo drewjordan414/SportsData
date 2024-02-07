@@ -62,7 +62,7 @@ def get_data(api_key, sport, data_type, name):
 # User Input for API Data
 def user_input():
     sports_completer = WordCompleter(['MLB', 'Soccer', 'NFL', 'NBA', 'College Basketball'], ignore_case=True)
-    data_type_completer = WordCompleter(['team', 'player'], ignore_case=True)
+    data_type_completer = WordCompleter(['Team', 'Player'], ignore_case=True)
 
     print("Select the sport:")
     sport = prompt('Sport: ', completer=sports_completer)
