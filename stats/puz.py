@@ -9,6 +9,15 @@ import os
 from team_mappings import team_mappings
 from player_mappings import player_mappings
 from team_stats_mappings import stats_mappings
+from stats.season_stats import mlb_stats
+from stats.season_stats import nfl_stats
+from stats.season_stats import nba_stats
+from teamMaps import cbb_mappings
+from teamMaps import mlb_mappings
+from teamMaps import nba_mappings
+from teamMaps import nfl_mappings
+
+
 
 #load environment variables
 load_dotenv()
@@ -74,15 +83,15 @@ def fetch_options(api_key, sport, data_type, identifier=None):
     elif data_type == 'Player':
         # Directly use identifier for player data endpoint
         if sport == 'MLB':
-            url = f"{base_url}mlb/scores/json/PlayersBasic/{team_abbr}?key={api_key}"
+            url = f"{base_url}mlb/scores/json/PlayersBasic/{mlb_mappings}?key={api_key}"
         elif sport == 'Soccer':
             url = f"{soccer_url}soccer/scores/json/PlayersByTeam/{team_abbr}?key={api_key}"
         elif sport == 'NFL':
-            url = f"{base_url}nfl/scores/json/PlayersBasic/{team_abbr}?key={api_key}"
+            url = f"{base_url}nfl/scores/json/PlayersBasic/{nfl_mappings}?key={api_key}"
         elif sport == 'NBA':
-            url = f"{base_url}nba/scores/json/Players/{team_abbr}?key={api_key}"
+            url = f"{base_url}nba/scores/json/Players/{nba_mappings}?key={api_key}"
         elif sport == 'College Basketball':
-            url = f"{base_url}cbb/scores/json/PlayersBasic/{team_abbr}?key={api_key}"
+            url = f"{base_url}cbb/scores/json/PlayersBasic/{cbb_mappings}?key={api_key}"
 
     response = requests.get(url)
     if response.status_code == 200:
@@ -94,8 +103,17 @@ def fetch_options(api_key, sport, data_type, identifier=None):
 def display_team_stats(api_key, sport, team_abbr):
     base_url = "https://api.sportsdata.io/v3/"
     headers = {"Ocp-Apim-Subscription-Key": api_key}
-    team_stats_url = f"{base_url}{sport.lower()}/scores/json/TeamSeasonStats/{stats_mappings}?key={api_key}"
-    print("Requesting URL:", team_stats_url)  # Debug print
+    
+    if sport == 'MLB':
+        team_stats_url = f"{base_url}mlb/scores/json/TeamSeasonStats/{mlb_stats}?key={api_key}"
+    elif sport == 'NFL':
+        team_stats_url = f"{base_url}nfl/scores/json/TeamSeasonStats/{nfl_stats}?key={api_key}"
+    elif sport == 'NBA':
+        team_stats_url = f"{base_url}nba/scores/json/TeamSeasonStats/{nba_stats}?key={api_key}"
+    elif sport == 'College Basketball':
+        team_stats_url = f"{base_url}cbb/scores/json/TeamSeasonStats/{team_abbr}?key={api_key}"
+    # Add conditions for other sports if necessary
+    
     response = requests.get(team_stats_url, headers=headers)
     print("Response:", response.status_code, response.json())
 

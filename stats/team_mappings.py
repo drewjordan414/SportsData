@@ -32,6 +32,7 @@ team_mappings = {
             "Cincinnati Reds": "CIN",
             # ... other MLB teams
         },
+        
         'NFL': {
             "Washington Redskins": "WAS",
             "New York Giants": "NYG",
