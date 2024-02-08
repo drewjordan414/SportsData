@@ -160,6 +160,9 @@ def display_player_stats(api_key, sport, player_abbr):
 #         display_player_stats(api_key, sport, player_abbr)
 
 #     return team_name, post_team_selection
+        
+
+# Debugging variation of the function 
 def user_input(api_key, sport):
     # Fetch and display team options
     team_options = fetch_options(api_key, sport, 'Team')
