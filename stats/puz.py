@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import os
 from team_mappings import team_mappings
 from player_mappings import player_mappings
+from team_stats_mappings import stats_mappings
 
 #load environment variables
 load_dotenv()
@@ -73,15 +74,15 @@ def fetch_options(api_key, sport, data_type, identifier=None):
     elif data_type == 'Player':
         # Directly use identifier for player data endpoint
         if sport == 'MLB':
-            url = f"{base_url}mlb/scores/json/PlayersBasic/{team_mappings}?key={api_key}"
+            url = f"{base_url}mlb/scores/json/PlayersBasic/{team_abbr}?key={api_key}"
         elif sport == 'Soccer':
-            url = f"{soccer_url}soccer/scores/json/PlayersByTeam/{team_mappings}?key={api_key}"
+            url = f"{soccer_url}soccer/scores/json/PlayersByTeam/{team_abbr}?key={api_key}"
         elif sport == 'NFL':
-            url = f"{base_url}nfl/scores/json/PlayersBasic/{team_mappings}?key={api_key}"
+            url = f"{base_url}nfl/scores/json/PlayersBasic/{team_abbr}?key={api_key}"
         elif sport == 'NBA':
-            url = f"{base_url}nba/scores/json/Players/{team_mappings}?key={api_key}"
+            url = f"{base_url}nba/scores/json/Players/{team_abbr}?key={api_key}"
         elif sport == 'College Basketball':
-            url = f"{base_url}cbb/scores/json/PlayersBasic/{team_mappings}?key={api_key}"
+            url = f"{base_url}cbb/scores/json/PlayersBasic/{team_abbr}?key={api_key}"
 
     response = requests.get(url)
     if response.status_code == 200:
@@ -93,7 +94,7 @@ def fetch_options(api_key, sport, data_type, identifier=None):
 def display_team_stats(api_key, sport, team_abbr):
     base_url = "https://api.sportsdata.io/v3/"
     headers = {"Ocp-Apim-Subscription-Key": api_key}
-    team_stats_url = f"{base_url}{sport.lower()}/scores/json/TeamStats/{team_abbr}"
+    team_stats_url = f"{base_url}{sport.lower()}/scores/json/TeamSeasonStats/{stats_mappings}?key={api_key}"
     print("Requesting URL:", team_stats_url)  # Debug print
     response = requests.get(team_stats_url, headers=headers)
     print("Response:", response.status_code, response.json())
@@ -121,12 +122,35 @@ def display_player_stats(api_key, sport, player_abbr):
         print(f"Error fetching player stats: {response.status_code}")
 
 # User Input Function
+# def user_input(api_key, sport):
+#     # Fetch and display team options
+#     team_options = fetch_options(api_key, sport, 'Team')
+#     team_completer = WordCompleter(team_options, ignore_case=True)
+#     team_name = prompt("Select the Team: ", completer=team_completer)
+#     team_abbr = team_mappings[sport].get(team_name, "Unknown")
+
+#     # Choose between showing team stats or players
+#     post_team_selection_completer = WordCompleter(['Show Team Stats', 'Show Players'], ignore_case=True)
+#     post_team_selection = prompt("Choose an option: ", completer=post_team_selection_completer)
+
+#     if post_team_selection == 'Show Team Stats':
+#         display_team_stats(api_key, sport, team_abbr)
+#     elif post_team_selection == 'Show Players':
+#         player_options = fetch_options(api_key, sport, 'Player', team_abbr)
+#         player_completer = WordCompleter(player_options, ignore_case=True)
+#         player_name = prompt("Select the Player: ", completer=player_completer)
+#         player_abbr = player_mappings[sport].get(player_name, "Unknown")
+#         display_player_stats(api_key, sport, player_abbr)
+
+#     return team_name, post_team_selection
 def user_input(api_key, sport):
     # Fetch and display team options
     team_options = fetch_options(api_key, sport, 'Team')
+    print("Team Options:", team_options)  # Debug print
     team_completer = WordCompleter(team_options, ignore_case=True)
     team_name = prompt("Select the Team: ", completer=team_completer)
     team_abbr = team_mappings[sport].get(team_name, "Unknown")
+    print("Selected Team Abbreviation:", team_abbr)  # Debug print
 
     # Choose between showing team stats or players
     post_team_selection_completer = WordCompleter(['Show Team Stats', 'Show Players'], ignore_case=True)
@@ -136,12 +160,18 @@ def user_input(api_key, sport):
         display_team_stats(api_key, sport, team_abbr)
     elif post_team_selection == 'Show Players':
         player_options = fetch_options(api_key, sport, 'Player', team_abbr)
-        player_completer = WordCompleter(player_options, ignore_case=True)
-        player_name = prompt("Select the Player: ", completer=player_completer)
-        player_abbr = player_mappings[sport].get(player_name, "Unknown")
-        display_player_stats(api_key, sport, player_abbr)
+        print("Player Options:", player_options)  # Debug print
+        if player_options:
+            player_completer = WordCompleter(player_options, ignore_case=True)
+            player_name = prompt("Select the Player: ", completer=player_completer)
+            player_abbr = player_mappings[sport].get(player_name, "Unknown")
+            display_player_stats(api_key, sport, player_abbr)
+        else:
+            print("No players found for the selected team.")
 
     return team_name, post_team_selection
+
+
 
 #Quick Sort Algorithm
 def quick_sort(arr):
