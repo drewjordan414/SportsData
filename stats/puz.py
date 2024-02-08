@@ -8,10 +8,9 @@ from dotenv import load_dotenv
 import os
 from team_mappings import team_mappings
 from player_mappings import player_mappings
-from team_stats_mappings import stats_mappings
-from stats.season_stats import mlb_stats
-from stats.season_stats import nfl_stats
-from stats.season_stats import nba_stats
+from season_stats import mlb_stats
+from season_stats import nfl_stats
+from season_stats import nba_stats
 from teamMaps import cbb_mappings
 from teamMaps import mlb_mappings
 from teamMaps import nba_mappings
